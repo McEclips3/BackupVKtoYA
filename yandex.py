@@ -1,5 +1,7 @@
 import requests
 from collections import Counter
+import time
+from tqdm import tqdm
 
 
 class YandexDisk:
@@ -23,10 +25,11 @@ class YandexDisk:
 
     def upload_file(self, file_path, name):
         href = self._get_link(file_path=file_path)
-        response = requests.put(href, data=open(name, 'rb'))
-        response.raise_for_status()
-        if response.status_code == 201:
-            print('Файл залит')
+        with open(name, 'rb') as f:
+            response = requests.put(href, data=f)
+            response.raise_for_status()
+            if response.status_code == 201:
+                print('Файл залит')
 
     def create_folder(self, folder_name):
         print(f'Создание папки {folder_name}')
@@ -47,16 +50,17 @@ class YandexDisk:
         folder = self.create_folder(folder_name=folder_name)
         path = f'{folder}/{file}'
         href = self._get_link(file_path=path)
-        response = requests.put(href, data=open(text, 'rb'))
-        response.raise_for_status()
-        if response.status_code == 201:
-            print('Файл залит')
+        with open(text, 'rb') as f:
+            response = requests.put(href, data=f)
+            response.raise_for_status()
+            if response.status_code == 201:
+                print('Файл залит')
 
     def upload_photo(self, photos, folder_name):
         folder = self.create_folder(folder_name=folder_name)
         like_list = []
         log_dict = []
-        for photo in photos:
+        for photo in tqdm(photos):
             url = photo['url']
             date = photo['date']
             likes = photo['likes']
@@ -73,5 +77,6 @@ class YandexDisk:
             data = response.content
             resp = requests.put(href, data=data)
             if resp.status_code == 201:
-                print(f'Фото {name} загружено')
+                time.sleep(1)
+                # print(f'Фото {name} загружено')
         return log_dict

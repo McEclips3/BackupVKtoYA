@@ -27,7 +27,7 @@ class Vk:
             result = res['response']['object_id']
         return result
 
-    def get_photos(self, user_id, count):
+    def get_photos_dict(self, user_id, count):
         photos_url = self.url + 'photos.get'
         user_id = self.id(user_id=user_id)
         print(f'Найден id: {user_id}')
@@ -39,6 +39,10 @@ class Vk:
         res = requests.get(photos_url, params={**self.params, **photos_params}).json()
         photos_full = res['response']['items']
         print('Получен доступ к фотографиям')
+        return photos_full
+
+    def get_photos(self, user_id, count):
+        photos_full = self.get_photos_dict(user_id=user_id, count=count)
         photos = []
         for i in photos_full:
             likes = i['likes']['count']
